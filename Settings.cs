@@ -10,7 +10,11 @@ namespace HandwrittenNumbersRecognition
 
         public static double learningSpeed = 0.9;
 
-        public static int inputs = 28 * 28 *3;
+        public static int imageHeight = 28;
+
+        public static int imageWidth = 28;
+
+        public static int inputs = imageHeight * imageWidth;
 
         public static int outputs = 10;
 

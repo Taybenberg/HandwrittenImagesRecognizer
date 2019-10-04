@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using ImageMagick;
 
 namespace HandwrittenNumbersRecognition
 {
@@ -19,10 +20,24 @@ namespace HandwrittenNumbersRecognition
 
         public string GetNextImage(int number)
         {
-            if (images[number].Length < imagesIndex[number])
+            if (images[number].Length <= imagesIndex[number])
                 imagesIndex[number] = 0;
 
             return images[number][imagesIndex[number]++];
+        }
+
+        public void ConvertImages()
+        {
+            foreach (var i in images)
+                foreach (var img in i)
+                    using (MagickImage image = new MagickImage(img))
+                    {
+                        image.ColorSpace = ColorSpace.Gray;
+
+                        image.Resize(Settings.imageWidth, Settings.imageHeight);
+
+                        image.Write(img);
+                    }
         }
     }
 }

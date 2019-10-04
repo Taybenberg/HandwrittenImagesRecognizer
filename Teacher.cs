@@ -129,7 +129,7 @@ namespace HandwrittenNumbersRecognition
         {
             using (var bitmap = new Bitmap(path))
             {
-                BitmapData bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                BitmapData bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
 
                 int numbytes = bmpdata.Stride * bitmap.Height;
 
@@ -147,8 +147,8 @@ namespace HandwrittenNumbersRecognition
         {
             if (File.Exists(netJson))
                 return JsonConvert.DeserializeObject<NeuralNet>(File.ReadAllText(netJson, Encoding.UTF8));
-            else
-                return new NeuralNet();
+                
+            return new NeuralNet();
         }
 
         void SaveNet(NeuralNet neuralNet)
