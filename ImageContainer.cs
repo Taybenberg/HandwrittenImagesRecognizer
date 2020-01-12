@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using ImageMagick;
 
 namespace HandwrittenNumbersRecognition
 {
@@ -13,7 +12,7 @@ namespace HandwrittenNumbersRecognition
         {
             for (int i = 0; i < 10; i++)
             {
-                images[i] = Directory.GetFiles(path + @"\" + i).ToArray();
+                images[i] = Directory.GetFiles($"{path}\\{i}").ToArray();
                 imagesIndex[i] = 0;
             }
         }
@@ -24,20 +23,6 @@ namespace HandwrittenNumbersRecognition
                 imagesIndex[number] = 0;
 
             return images[number][imagesIndex[number]++];
-        }
-
-        public void ConvertImages()
-        {
-            foreach (var i in images)
-                foreach (var img in i)
-                    using (MagickImage image = new MagickImage(img))
-                    {
-                        image.ColorSpace = ColorSpace.Gray;
-
-                        image.Resize(Settings.imageWidth, Settings.imageHeight);
-
-                        image.Write(img);
-                    }
         }
     }
 }

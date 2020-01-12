@@ -20,7 +20,7 @@ namespace HandwrittenNumbersRecognition
 
         public static int[] hiddenLayersSizes = new int[]
         {
-            80,
+            100
         };
 
         public static int getLayerSize(int index)

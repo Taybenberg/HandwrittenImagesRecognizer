@@ -23,7 +23,7 @@ namespace HandwrittenNumbersRecognition
             neuralNet = LoadNet();
         }
 
-        public void Recoznize(string imagePath)
+        public void Recognize(string imagePath)
         {
             var output = neuralNet.Output(ImageToByteArray(imagePath));
 
@@ -74,35 +74,24 @@ namespace HandwrittenNumbersRecognition
 
                     neuralNet.BackPropagation(expected);
 
-                    if (epoch % 1000 == 0)
+                    if (printMessages || epoch % 1000 == 0)
                     {
-                        SaveNet(neuralNet);
+                        if (epoch % 1000 == 0)
+                            SaveNet(neuralNet);
 
                         Console.Write($"\n\nEpoch: {epoch}; Image: {img}\nNeuralNet output: ");
 
                         double error = 0.0;
+
                         int max = 0;
+
                         for (int i = 0; i < Settings.outputs; ++i)
                         {
                             error += (output[i] - expected[i]) * (output[i] - expected[i]);
+
                             if (output[i] > output[max])
                                 max = i;
-                            Console.Write($"{output[i]} ");
-                        }
 
-                        Console.WriteLine($"\nError: {error / 2}\nOutput number: {max}; Expected number: {number}");
-                    }
-                    else if (printMessages)
-                    {
-                        Console.Write($"\n\nEpoch: {epoch}; Image: {img}\nNeuralNet output: ");
-
-                        double error = 0.0;
-                        int max = 0;
-                        for (int i = 0; i < Settings.outputs; ++i)
-                        {
-                            error += (output[i] - expected[i]) * (output[i] - expected[i]);
-                            if (output[i] > output[max])
-                                max = i;
                             Console.Write($"{output[i]} ");
                         }
 
@@ -120,6 +109,8 @@ namespace HandwrittenNumbersRecognition
                     Settings.learningSpeed *= 0.9;
                 else if (key == ConsoleKey.UpArrow)
                     Settings.learningSpeed /= 0.9;
+                else if (key == ConsoleKey.Enter)
+                    printMessages = !printMessages;
 
                 Console.WriteLine($"\nLearning speed: {Settings.learningSpeed}\n");
             }

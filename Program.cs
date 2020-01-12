@@ -5,7 +5,7 @@
         static void Main(string[] args)
         {
             new Teacher(yourDatasetPath);
-            new Teacher().Recoznize(yourImagePath);
+            new Teacher().Recognize(yourImagePath);
         }
     }
 }

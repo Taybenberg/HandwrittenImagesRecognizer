@@ -55,28 +55,28 @@ namespace HandwrittenNumbersRecognition
 
             double[] tmpLayer;
 
-            input.CopyTo(layers[layers.Count - 1], 0);
+            input.CopyTo(layers[^1], 0);
 
             for (int i = 0; i < Settings.hiddenLayersSizes.Length + 1; ++i)
             {
-                double sum = Settings.bias * BiasWeights[i];
-
                 tmpLayer = new double[Settings.getLayerSize(i + 1)];
 
                 for (int j = 0; j < Settings.getLayerSize(i + 1); ++j)
                 {
+                    double sum = Settings.bias * BiasWeights[i];
+
                     for (int z = 0; z < Settings.getLayerSize(i); ++z)
-                        sum += layers[layers.Count - 1][z] * Weights[i][j][z];
+                        sum += layers[^1][z] * Weights[i][j][z];
 
                     tmpLayer[j] = Settings.activationFunction(sum);
                 }
 
                 layers.Add(new double[Settings.getLayerSize(i + 1)]);
 
-                tmpLayer.CopyTo(layers[layers.Count - 1], 0);
+                tmpLayer.CopyTo(layers[^1], 0);
             }
 
-            return layers[layers.Count - 1];
+            return layers[^1];
         }
 
         public void BackPropagation(double[] correctOutput)
@@ -87,7 +87,7 @@ namespace HandwrittenNumbersRecognition
 
             for (int i = 0; i < correctOutput.Length; ++i)
             {
-                tmpLayer[i] = (layers[layers.Count - 1][i] - correctOutput[i]) * (layers[layers.Count - 1][i] * (1.0 - layers[layers.Count - 1][i]));
+                tmpLayer[i] = (layers[^1][i] - correctOutput[i]) * (layers[^1][i] * (1.0 - layers[^1][i]));
                 errorSum += tmpLayer[i] * Settings.bias;
             }
 
@@ -97,14 +97,14 @@ namespace HandwrittenNumbersRecognition
             {
                 BiasWeights[i] -= Settings.learningSpeed * errorSum;
 
-                double[] hiddenLayer = new double[layers[layers.Count - 1].Length];
+                double[] hiddenLayer = new double[layers[^1].Length];
 
                 for (int j = 0; j < Settings.getLayerSize(i + 1); ++j)
                 {
                     for (int z = 0; z < Settings.getLayerSize(i); ++z)
                     {
                         hiddenLayer[z] += tmpLayer[j] * Weights[i][j][z];
-                        Weights[i][j][z] -= Settings.learningSpeed * tmpLayer[j] * layers[layers.Count - 1][z];
+                        Weights[i][j][z] -= Settings.learningSpeed * tmpLayer[j] * layers[^1][z];
                     }
                 }
 
@@ -116,7 +116,7 @@ namespace HandwrittenNumbersRecognition
 
                     for (int j = 0; j < tmpLayer.Length; ++j)
                     {
-                        tmpLayer[j] = hiddenLayer[j] * (layers[layers.Count - 1][j] * (1.0 - layers[layers.Count - 1][j]));
+                        tmpLayer[j] = hiddenLayer[j] * (layers[^1][j] * (1.0 - layers[^1][j]));
                         errorSum += tmpLayer[j] * Settings.bias;
                     }
 
