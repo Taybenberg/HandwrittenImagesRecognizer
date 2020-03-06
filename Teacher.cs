@@ -57,6 +57,8 @@ namespace HandwrittenNumbersRecognition
 
         void Train()
         {
+            Console.ForegroundColor = ConsoleColor.White;
+
             int epoch = 0;
 
             while (true)
@@ -87,7 +89,7 @@ namespace HandwrittenNumbersRecognition
 
                         for (int i = 0; i < Settings.outputs; ++i)
                         {
-                            error += (output[i] - expected[i]) * (output[i] - expected[i]);
+                            error += ((expected[i] - output[i]) * (expected[i] - output[i])) / 2;
 
                             if (output[i] > output[max])
                                 max = i;
@@ -95,7 +97,14 @@ namespace HandwrittenNumbersRecognition
                             Console.Write($"{output[i]} ");
                         }
 
-                        Console.WriteLine($"\nError: {error / 2}\nOutput number: {max}; Expected number: {number}");
+                        if (expected[max] == 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+                        else
+                            Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
                     }
 
                     epoch++;
