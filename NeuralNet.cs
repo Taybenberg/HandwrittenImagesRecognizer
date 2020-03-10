@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace HandwrittenNumbersRecognition
 {
@@ -64,7 +65,7 @@ namespace HandwrittenNumbersRecognition
             {
                 tmpLayer = new double[Settings.getLayerSize(i + 1)];
 
-                for (int j = 0; j < Settings.getLayerSize(i + 1); j++)
+                Parallel.For(0, Settings.getLayerSize(i + 1), (j) =>
                 {
                     double sum = Settings.bias * BiasWeights[i];
 
@@ -72,7 +73,7 @@ namespace HandwrittenNumbersRecognition
                         sum += layers[^1][z] * Weights[i][j][z];
 
                     tmpLayer[j] = Settings.activationFunction(sum);
-                }
+                });
 
                 layers.Add(new double[Settings.getLayerSize(i + 1)]);
 
@@ -102,14 +103,14 @@ namespace HandwrittenNumbersRecognition
 
                 double[] hiddenLayer = new double[layers[^1].Length];
 
-                for (int j = 0; j < Settings.getLayerSize(i + 1); j++)
+                Parallel.For(0, Settings.getLayerSize(i + 1), (j) =>
                 {
                     for (int z = 0; z < Settings.getLayerSize(i); z++)
                     {
                         hiddenLayer[z] += tmpLayer[j] * Weights[i][j][z];
                         Weights[i][j][z] -= Settings.learningSpeed * tmpLayer[j] * layers[^1][z];
                     }
-                }
+                });
 
                 if (i > 0)
                 {
