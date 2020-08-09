@@ -25,7 +25,7 @@ namespace HandwrittenNumbersRecognition
 
         public void Recognize(string imagePath)
         {
-            var output = neuralNet.Output(ImageToByteArray(imagePath));
+            var output = neuralNet.Output(ImageToDoubleArray(imagePath));
 
             Console.WriteLine($"Image: {imagePath}");
 
@@ -61,71 +61,82 @@ namespace HandwrittenNumbersRecognition
 
             int epoch = 0;
 
-            while (true)
+            bool flag = true;
+
+            while (flag)
             {
-                while (!Console.KeyAvailable)
+                double[] expected = new double[Settings.outputs];
+
+                int number = Settings.R.Next(0, Settings.outputs);
+
+                expected[number] = 1.0;
+
+                string img = imageContainer.GetNextImage(number);
+
+                double[] output = neuralNet.Output(ImageToDoubleArray(img));
+
+                neuralNet.BackPropagation(expected);
+
+                if (printMessages || epoch % 1000 == 0)
                 {
-                    int number = Settings.R.Next(0, Settings.outputs);
+                    Console.Write($"\n\nEpoch: {epoch}; Image: {img}\nNeuralNet output: ");
 
-                    double[] expected = new double[Settings.outputs];
-                    expected[number] = 1.0;
+                    double error = 0.0;
 
-                    string img = imageContainer.GetNextImage(number);
+                    int max = 0;
 
-                    double[] output = neuralNet.Output(ImageToByteArray(img));
-
-                    neuralNet.BackPropagation(expected);
-
-                    if (printMessages || epoch % 1000 == 0)
+                    for (int i = 0; i < Settings.outputs; i++)
                     {
-                        if (epoch % 1000 == 0)
-                            SaveNet(neuralNet);
+                        error += ((expected[i] - output[i]) * (expected[i] - output[i])) / 2;
 
-                        Console.Write($"\n\nEpoch: {epoch}; Image: {img}\nNeuralNet output: ");
+                        if (output[i] > output[max])
+                            max = i;
 
-                        double error = 0.0;
-
-                        int max = 0;
-
-                        for (int i = 0; i < Settings.outputs; ++i)
-                        {
-                            error += ((expected[i] - output[i]) * (expected[i] - output[i])) / 2;
-
-                            if (output[i] > output[max])
-                                max = i;
-
-                            Console.Write($"{output[i]} ");
-                        }
-
-                        if (expected[max] == 1)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        else
-                            Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
+                        Console.Write($"{output[i]} ");
                     }
 
-                    epoch++;
+                    if (expected[max] == 1)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                        Console.WriteLine($"\nError: {error}\nOutput number: {max}; Expected number: {number}");
+
+                    if (epoch % 1000 == 0)
+                        SaveNet(neuralNet);
+                }
+        
+                if (Console.KeyAvailable)
+                {
+                    switch (Console.ReadKey(true).Key)
+                    {
+                        case ConsoleKey.Escape:
+                            flag = false;
+                            break;
+
+                        case ConsoleKey.DownArrow:
+                            Settings.learningSpeed *= 0.9;
+                            break;
+
+                        case ConsoleKey.UpArrow:
+                            Settings.learningSpeed /= 0.9;
+                            break;
+
+                        case ConsoleKey.Enter:
+                            printMessages = !printMessages;
+                            break;
+                    }
+
+                    Console.WriteLine($"\nLearning speed: {Settings.learningSpeed}\n");
                 }
 
-                var key = Console.ReadKey(true).Key;
-
-                if (key == ConsoleKey.Escape)
-                    break;
-                else if (key == ConsoleKey.DownArrow)
-                    Settings.learningSpeed *= 0.9;
-                else if (key == ConsoleKey.UpArrow)
-                    Settings.learningSpeed /= 0.9;
-                else if (key == ConsoleKey.Enter)
-                    printMessages = !printMessages;
-
-                Console.WriteLine($"\nLearning speed: {Settings.learningSpeed}\n");
+                epoch++;
             }
         }
 
-        byte[] ImageToByteArray(string path)
+        double[] ImageToDoubleArray(string path)
         {
             using (var bitmap = new Bitmap(path))
             {
@@ -139,7 +150,12 @@ namespace HandwrittenNumbersRecognition
 
                 bitmap.UnlockBits(bmpdata);
 
-                return bytedata;
+                double[] data = new double[bytedata.Length];
+
+                for (int i = 0; i < bytedata.Length; i++)
+                    data[i] = bytedata[i] / 255d;
+
+                return data;
             }
         }
 

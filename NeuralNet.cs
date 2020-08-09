@@ -48,18 +48,13 @@ namespace HandwrittenNumbersRecognition
             BiasWeights = null;
         }
 
-        public double[] Output(byte[] input)
+        public double[] Output(double[] input)
         {
             layers.Clear();
             
-            layers.Add(new double[Settings.getLayerSize(0)]);
+            layers.Add(input);
 
             double[] tmpLayer;
-
-            input.CopyTo(layers[^1], 0);
-
-            for (int i = 0; i < layers[^1].Length; i++)
-                layers[^1][i] /= 255;
 
             for (int i = 0; i < Settings.hiddenLayersSizes.Length + 1; i++)
             {
@@ -85,7 +80,7 @@ namespace HandwrittenNumbersRecognition
 
         public void BackPropagation(double[] correctOutput)
         {
-            double[] tmpLayer = new double[correctOutput.Length];
+            double[] tmpLayer = new double[Settings.outputs];
 
             double tmpBias = 0;
 
@@ -95,10 +90,10 @@ namespace HandwrittenNumbersRecognition
                 tmpBias += tmpLayer[i];
             }
 
-            layers.RemoveAt(layers.Count - 1);
-
             for (int i = Settings.hiddenLayersSizes.Length; i >= 0; i--)
             {
+                layers.RemoveAt(layers.Count - 1);
+
                 BiasWeights[i] -= Settings.learningSpeed * tmpBias * Settings.bias;
 
                 double[] hiddenLayer = new double[layers[^1].Length];
@@ -112,19 +107,17 @@ namespace HandwrittenNumbersRecognition
                     }
                 });
 
-                if (i > 0)
+                if (i <= 0)
+                    break;
+
+                tmpLayer = new double[hiddenLayer.Length];
+
+                tmpBias = 0;
+
+                for (int j = 0; j < tmpLayer.Length; j++)
                 {
-                    tmpLayer = new double[hiddenLayer.Length];
-
-                    tmpBias = 0;
-
-                    for (int j = 0; j < tmpLayer.Length; j++)
-                    {
-                        tmpLayer[j] = hiddenLayer[j] * (layers[^1][j] * (1.0 - layers[^1][j]));
-                        tmpBias += tmpLayer[j];
-                    }
-
-                    layers.RemoveAt(layers.Count - 1);
+                    tmpLayer[j] = hiddenLayer[j] * (layers[^1][j] * (1.0 - layers[^1][j]));
+                    tmpBias += tmpLayer[j];
                 }
             }
         }
