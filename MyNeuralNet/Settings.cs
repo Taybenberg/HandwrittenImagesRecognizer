@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HandwrittenNumbersRecognition
+namespace HandwrittenNumbersRecognition.MyNeuralNet
 {
     public static class Settings
     {

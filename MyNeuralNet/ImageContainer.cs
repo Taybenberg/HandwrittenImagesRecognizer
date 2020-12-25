@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 
-namespace HandwrittenNumbersRecognition
+namespace HandwrittenNumbersRecognition.MyNeuralNet
 {
     public class ImageContainer
     {
