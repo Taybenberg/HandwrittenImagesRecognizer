@@ -5,14 +5,12 @@ namespace HandwrittenNumbersRecognition.MyNeuralNet
     public class Teacher
     {
         ImageContainer imageContainer;
-
         ImageRecognizer imageRecognizer;
 
-        public Teacher(string datasetPath)
+        public Teacher(string datasetPath, string modelPath)
         {
             imageContainer = new(datasetPath);
-
-            imageRecognizer = new();
+            imageRecognizer = new(modelPath);
         }
 
         public void Train(bool printMessages = false)

@@ -13,7 +13,7 @@ namespace HandwrittenNumbersRecognition.MyNeuralNet
         NeuralNet neuralNet;
         string modelPath;
 
-        public ImageRecognizer(string modelPath = "NeuralNet.json")
+        public ImageRecognizer(string modelPath)
         {
             this.modelPath = modelPath;
 
