@@ -22,7 +22,7 @@ namespace HandwrittenNumbersRecognition.ML_NET
                     {
                         ImagePath = file,
                         Label = Convert.ToUInt32(i)
-                    });
+                    }));
             });
 
             return data.SelectMany(x => x);
